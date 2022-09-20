@@ -10,3 +10,4 @@ WORKDIR /app
 EXPOSE 80
 EXPOSE 443
 COPY --from=build /app .
+ENTRYPOINT ["dotnet", "Catalog.API.dll"]
