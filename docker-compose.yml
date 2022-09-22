@@ -9,8 +9,30 @@ services:
       - "27017:27017"
     volumes:
       - mongo_data:/data/db
-        
-        
+  
+  redis-basket-cache:
+    image: redis:alpine
+    container_name: redis-container
+    restart: always
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+  
+  discount-db: # postgres
+    image: postgres
+    container_name: postgres-container
+    environment:
+      - POSTGRES_USER=admin
+      - POSTGRES_PASSWORD=admin1234
+      - POSTGRES_DB=DiscountDb
+    restart: always
+    ports:
+        - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data/
+  
+  
   portainer:
     image: portainer/portainer-ce
     container_name: portainer-container
@@ -35,14 +57,6 @@ services:
     ports:
       - "4701:80"
   
-  redis-basket-cache:
-    image: redis:alpine
-    container_name: redis-container
-    restart: always
-    ports:
-      - "6379:6379"
-    volumes:
-        - redis_data:/data
   
   
   basket.api:
@@ -57,8 +71,23 @@ services:
       - redis-basket-cache
     ports:
       - "4702:80"
+  
+  discount.api:
+    container_name: discount.api-container
+    build:
+      context: .
+      dockerfile: services/Discount.API/Dockerfile
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - "DatabaseSettings:ConnectionString=Server=postgres-container;Port=5432;Database=DiscountDb;User Id=admin;Password=admin1234;"
+
+    depends_on:
+      - discount-db
+    ports:
+      - "4703:80"
 
 volumes:
   mongo_data:
   redis_data:
   portainer_data:
+  postgres_data:
