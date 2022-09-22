@@ -4,6 +4,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Catalog.API", "services\Cat
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Basket.API", "services\Basket.API\Basket.API.csproj", "{7D3AB5F6-FFDE-4B63-9CCB-9A51A270CF1C}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Discount.API", "services\Discount.API\Discount.API.csproj", "{82F20C17-B205-41AE-8A0E-3C7A311123F1}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -18,5 +20,9 @@ Global
 		{7D3AB5F6-FFDE-4B63-9CCB-9A51A270CF1C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{7D3AB5F6-FFDE-4B63-9CCB-9A51A270CF1C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{7D3AB5F6-FFDE-4B63-9CCB-9A51A270CF1C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{82F20C17-B205-41AE-8A0E-3C7A311123F1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{82F20C17-B205-41AE-8A0E-3C7A311123F1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{82F20C17-B205-41AE-8A0E-3C7A311123F1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{82F20C17-B205-41AE-8A0E-3C7A311123F1}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

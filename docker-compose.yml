@@ -1,0 +1,64 @@
+version: '3.4'
+
+services:
+  mongo-catalog-db:
+    image: mongo
+    container_name: mongo-catalog-db-container
+    restart: always
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo_data:/data/db
+        
+        
+  portainer:
+    image: portainer/portainer-ce
+    container_name: portainer-container
+    restart: always
+    ports:
+      - "4780:8000"
+      - "9000:9000"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - portainer_data:/data
+  
+  catalog.api:
+    container_name: catalog.api-container
+    build:
+      context: .
+      dockerfile: services/Catalog.API/Dockerfile
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - "DatabaseSettings:ConnectionString=mongodb://mongo-catalog-db-container:27017"
+    depends_on:
+      - mongo-catalog-db
+    ports:
+      - "4701:80"
+  
+  redis-basket-cache:
+    image: redis:alpine
+    container_name: redis-container
+    restart: always
+    ports:
+      - "6379:6379"
+    volumes:
+        - redis_data:/data
+  
+  
+  basket.api:
+    container_name: basket.api-container
+    build:
+      context: .
+      dockerfile: services/Basket.API/Dockerfile
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - "CacheSettings:ConnectionString=redis-basket-cache-container:6379"
+    depends_on:
+      - redis-basket-cache
+    ports:
+      - "4702:80"
+
+volumes:
+  mongo_data:
+  redis_data:
+  portainer_data:
