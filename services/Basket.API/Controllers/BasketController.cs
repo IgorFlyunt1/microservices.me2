@@ -2,6 +2,8 @@
 using Basket.API.Repositories;
 using Microsoft.AspNetCore.Mvc;
 using System.Net;
+using AutoMapper;
+using Basket.API.GrpcServices;
 using Basket.API.Responses;
 
 namespace Basket.API.Controllers
@@ -12,21 +14,17 @@ namespace Basket.API.Controllers
     {
         private readonly IBasketRepository _repository;
 
-        public BasketController(IBasketRepository repository)
+        private readonly DiscountGrpcService _discountGrpcService;
+
+        // private readonly IPublishEndpoint _publishEndpoint;
+        private readonly IMapper _mapper;
+
+        public BasketController(IBasketRepository repository, DiscountGrpcService discountGrpcService, IMapper mapper)
         {
             _repository = repository ?? throw new ArgumentNullException(nameof(repository));
+            _discountGrpcService = discountGrpcService ?? throw new ArgumentNullException(nameof(discountGrpcService));
+            _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
         }
-        // private readonly DiscountGrpcService _discountGrpcService;
-        // private readonly IPublishEndpoint _publishEndpoint;
-        // private readonly IMapper _mapper;
-
-        // public BasketController(IBasketRepository repository, DiscountGrpcService discountGrpcService, IPublishEndpoint publishEndpoint, IMapper mapper)
-        // {
-        //     _repository = repository ?? throw new ArgumentNullException(nameof(repository));
-        //     _discountGrpcService = discountGrpcService ?? throw new ArgumentNullException(nameof(discountGrpcService));
-        //     _publishEndpoint = publishEndpoint ?? throw new ArgumentNullException(nameof(publishEndpoint));
-        //     _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
-        // }
 
         [HttpGet("{userName}", Name = "GetBasket")]
         [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(ErrorResponse))]
@@ -38,25 +36,25 @@ namespace Basket.API.Controllers
         }
 
         [HttpPost]
-        [ProducesResponseType(typeof(ShoppingCart), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(ShoppingCart), (int) HttpStatusCode.OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(ErrorResponse))]
-        [ProducesResponseType((int)HttpStatusCode.NotFound)]
+        [ProducesResponseType((int) HttpStatusCode.NotFound)]
         public async Task<ActionResult<ShoppingCart>> UpdateBasket([FromBody] ShoppingCart basket)
         {
             // TODO : Communicate with Discount.Grpc
             // and Calculate latest prices of product into shopping cart
             // consume Discount Grpc
-            // foreach (var item in basket.Items)
-            // {
-            //     var coupon = await _discountGrpcService.GetDiscount(item.ProductName);
-            //     item.Price -= coupon.Amount;
-            // }
+            foreach (var item in basket.Items)
+            {
+                var coupon = await _discountGrpcService.GetDiscount(item.ProductName);
+                item.Price -= coupon.Amount;
+            }
 
             return Ok(await _repository.UpdateBasket(basket));
         }
 
         [HttpDelete("{userName}", Name = "DeleteBasket")]
-        [ProducesResponseType(typeof(void), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(void), (int) HttpStatusCode.OK)]
         public async Task<IActionResult> DeleteBasket(string userName)
         {
             await _repository.DeleteBasket(userName);
